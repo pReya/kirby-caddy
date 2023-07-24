@@ -1,0 +1,20 @@
+(common) {
+	php_fastcgi php:9000
+	tls internal
+	file_server {
+		hide .*
+	}
+}
+
+(kirby) {
+	@blocked {
+		path *.txt *.md *.mdown /content/* /site/* /kirby/*
+	}
+	redir @blocked /
+}
+
+:80 {
+	import common
+	import kirby
+	root * /usr/share/caddy
+}
