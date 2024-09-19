@@ -1,20 +1,23 @@
 (common) {
 	php_fastcgi php:9000
-	tls internal
-	file_server {
-		hide .*
-	}
+	encode zstd gzip
+	file_server
 }
 
 (kirby) {
 	@blocked {
-		path *.txt *.md *.mdown /content/* /site/* /kirby/*
+		path /content/* /site/* /kirby/* /.*
 	}
-	redir @blocked /
+	error @blocked "Not found" 404
+	handle_errors {
+		rewrite * /error # This should reference your Kirby error page
+		import common
+	}
 }
 
 :80 {
 	import common
 	import kirby
 	root * /usr/share/caddy
+	tls internal
 }
